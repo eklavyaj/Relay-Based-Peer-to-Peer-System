@@ -1,8 +1,14 @@
+NOTE - Kindly view the README.md file with a markdown viewer or visit the [github repo](https://github.com/eklavyaj/Relay-Based-Peer-to-Peer-System/) for the project.
+
 ## Directory Tree:
 
 ```
 Group_49
 │   README.md
+|   CS 342_Assignment 3_October_2020.pdf
+|
+│
+└───output  //images of terminal output, requested for "sample2.txt", i.e., available at 
 │
 └───server
 │   │   server.c        // server code 
