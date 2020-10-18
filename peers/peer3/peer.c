@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     peerSocket = CONNECT(argv[1], argv[2]);
 
     char *sendBuffer = "REQUEST by PEER", rcvBuffer[256];
-
+    //sending request to connect to server
     status = send(peerSocket, sendBuffer, strlen(sendBuffer), 0);
     printf("MESSAGE SENT BY PEER: %s\n", sendBuffer);
 
@@ -35,13 +35,16 @@ int main(int argc, char **argv)
     if (status < strlen(sendBuffer))
         ERROR("ERROR IN SENDING MESSAGE TO SERVER\n");
 
+    // fill rcvBuffer with 0
     bzero(rcvBuffer, 256);
+    // receive message into rcvBuffer
     status = recv(peerSocket, rcvBuffer, 255, 0);
     if (status < 0)
         ERROR("ERROR IN RECEIVING MESSAGE TO SERVER\n"); 
 
     printf("MESSAGE RECEIVED FROM SERVER: %s\n", rcvBuffer);
 
+    // compare response 
     char c = rcvBuffer[13];
     if (c == 'r')
     {
@@ -56,8 +59,6 @@ int main(int argc, char **argv)
 
     else
         ERROR("WRONG MESSAGE RECEIVED FROM SERVER\n");
-
-
 
 // --------------------------------------------------------------------------------------------------
 
@@ -94,14 +95,15 @@ int main(int argc, char **argv)
 
     char buffer[256];
     bzero(buffer, 256);
-    // printf("rcvBuffer: %s\n", buffer);
+    
+    //receive request message from client
     status = recv(socketToClient, buffer, sizeof(buffer), 0);
     if (status < 0)
         ERROR("ERROR IN RECEIVING MESSAGE FROM CLIENT\n");
 
     printf("MESSAGE REVEIVED FROM CLIENT: %s\n", buffer);
 
-    char check[]="REQUEST FILE by CLIENT :";
+    char check[] = "REQUEST FILE by CLIENT :";
 
     int i, flag = 1;
     for(i=0;i<strlen(check);i++)
@@ -136,12 +138,14 @@ int main(int argc, char **argv)
     if (flag == 0)
         ERROR("WRONG MESSAGE RECEIVED FROM CLIENT\n");
 
+    
     else if (flag == 1)
     {
         printf("CLIENT SEEKS FILE: %s\n", &buffer[strlen(check)]);
 
         FILE *peerInfo = fopen(&buffer[strlen(check)], "r");
-
+        
+        // check if file present in peer directory
         if (peerInfo == NULL)
         {
             printf("REQUESTED FILE NOT WITH PEER\n");
@@ -150,7 +154,6 @@ int main(int argc, char **argv)
             status = send(socketToClient, sendBuffer, strlen(sendBuffer), 0);
             if (status < 0)
                 ERROR("ERROR IN SENDING MESSAGE TO CLIENT\n");
-
         }
 
         else
@@ -164,12 +167,11 @@ int main(int argc, char **argv)
              //send the file
             fseek(peerInfo, 0, SEEK_END);
             long fsize = ftell(peerInfo);
-            fseek(peerInfo, 0, SEEK_SET);//send the pointer to beginning of the file
+            fseek(peerInfo, 0, SEEK_SET); //send the pointer to beginning of the file
 
             char *string = malloc(fsize + 1);
             fread(string, fsize, 1, peerInfo);
             fclose(peerInfo);
-            // printf("FILE HAS THE FOLLOWING CONTENT:\n%s\n",string);
 
             // send the file data to client
             status = send(socketToClient, string, strlen(string), 0);
@@ -189,7 +191,6 @@ int main(int argc, char **argv)
 
     else
     {
-        
         status = close(socketToClient);
         if (status < 0)
             ERROR("ERROR WHILE CLOSING SOCKET TO PEER\n");
@@ -199,7 +200,7 @@ int main(int argc, char **argv)
 
 }
 
-
+//connect to socket at given address and port number
 int CONNECT(char *address, char *portNo)
 {
     int sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -219,6 +220,7 @@ int CONNECT(char *address, char *portNo)
     return sock;
 }
 
+// function that raises error and exits the execution if error is raised
 void ERROR(char *message)
 {
     printf("%s", message);

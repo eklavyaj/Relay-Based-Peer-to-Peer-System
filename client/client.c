@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
 #include <string.h>
+
 void ERROR(char *message);
 int CONNECT(char *address, char *portNo);
 int CHECK(int socketToPeer, char *fileName);
@@ -15,17 +14,18 @@ void CLOSE(int socketToPeer);
 
 int main(int argc, char **argv) 
 {
+    //checking if arguments provided are ok
     if (argc != 3)  
     { 
         printf("USAGE: %s <server_IP> <client_Port>", argv[0]);
         exit(0);
     }
         
-    
+    //connect client to server first
     int sockectToServer;
     sockectToServer = CONNECT(argv[1], argv[2]);
 
-    // sending REQUEST for peer file to server
+    // sending REQUEST for peer info file to server
     char *requestMessage = "REQUEST FOR PEER INFO", buffer[256];
     int count;
 
@@ -33,14 +33,20 @@ int main(int argc, char **argv)
     if (count < strlen(requestMessage))
         ERROR("FAILURE IN REQUESTING PEER FILE");
 
+    // fill buffer with 0
     bzero(buffer, 256);
+
+    //receive data through buffer
     count = recv(sockectToServer, buffer, 255, 0);
 
     if (count < 0)
         ERROR("FAILURE IN OBTAINED PEER FILE\n");
 
+
     printf("\nRECEIVED THE FOLLOWING FROM THE SERVER: \n%s\n", buffer);
     printf("CLOSING CONNECTION WITH THE SERVER.\n\n");
+    
+    //close socket to server
     int status = close(sockectToServer);
 
     if (status < 0)
@@ -61,27 +67,29 @@ int main(int argc, char **argv)
     char peerName[INET_ADDRSTRLEN];
     char port[256];
 
+    //peerInfo2.txt contains the copied information from peerInfo.txt (information of peers stored on the server)
     peerInfo = fopen("peerInfo2.txt", "r");
     int sockectToPeer, result = 0;
     char temp;
+    
+    // going through each peer, creating a connection socket and then checking if that peer has the file or not
     while (fscanf(peerInfo, "%s%c%s", peerName, &temp, port) != EOF)
-    // while (fscanf(peerInfo, "%s", port) != EOF)
-
     {
         printf("ATTEMPTING TO CONNECT TO PEER -  %s:%s ...\n",peerName, port);
+        //connect
         sockectToPeer = CONNECT(peerName, port);
         printf("CONNECTED TO A PEER SUCCESSFULLY!\n");
 
-
+        // if the file has not been found till now, check if the most recently connected peer has the file
         if (result == 0)
         	result = CHECK(sockectToPeer, fileName);
+        // if file has already been found, close connection with the peers and print a message saying the same
         else if (result == 1){
             printf("FILE ALREADY FOUND IN A PREVIOUS PEER, HENCE CLOSING SOCKET...\n");
         	CLOSE(sockectToPeer);
         }
         printf("\n");  
     }
-
 
     if (result == 1)
         printf("\nFILE WAS FOUND!\n");
@@ -94,10 +102,13 @@ int main(int argc, char **argv)
 }
 
 
+// function that closes the socket connection between client and peer. 
 void CLOSE(int socketToPeer)
 {
+    // request message
 	char request[] = "REQUEST TO CLOSE";
 
+    // sending request to close socket
     int count = send(socketToPeer, request, strlen(request), 0);
     printf("MESSAGE SENT TO PEER: %s\n", request);
 
@@ -111,13 +122,14 @@ void CLOSE(int socketToPeer)
     return ;
 }
 
-
+// function that checks if the peer directory has the desired file.
 int CHECK(int socketToPeer, char *fileName)
 {
     //Sending File Request to the Peer
     char request[100];
     sprintf(request, "REQUEST FILE by CLIENT :%s", fileName);
 
+    // sending request 
     int count = send(socketToPeer, request, strlen(request), 0);
     printf("MESSAGE SENT TO PEER: %s\n", request);
 
@@ -126,11 +138,13 @@ int CHECK(int socketToPeer, char *fileName)
     
     char buffer[256];
     bzero(buffer, 256);
+    //receiving the response message and storing in buffer
     count = recv(socketToPeer, buffer, 255, 0);
 
     if (count < 0)
         ERROR("ERROR WHILE RECEIVING PEER RESPONSE\n");
 
+    //if file not found
     if (strcmp(buffer, "FILE NOT FOUND") == 0) 
     {
         printf("FILE NOT FOUND AT THIS PEER.\n\n");
@@ -142,6 +156,7 @@ int CHECK(int socketToPeer, char *fileName)
         return 0;
     }
 
+    // if file found
     else if (strcmp(buffer, "FILE FOUND") == 0)
     {
         printf("THIS PEER HAS THE FILE!\n");
@@ -167,7 +182,7 @@ int CHECK(int socketToPeer, char *fileName)
     }
 }
 
-
+// function to connect to socket
 int CONNECT(char *address, char *portNo)
 {
     int sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -187,6 +202,7 @@ int CONNECT(char *address, char *portNo)
     return sock;
 }
 
+// function that raises error and exits the execution if error is raised
 void ERROR(char *message)
 {
     printf("%s", message);
