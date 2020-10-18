@@ -50,6 +50,8 @@ To run the Application do the following steps:
 <li>Start PEER NODE 2 on the terminal with working directory as 'peer2'.</li>
 <li>Start PEER NODE 3 on the terminal with working directory as 'peer3'.</li>
 <li>Start PEER CLIENT on the terminal with working directory as 'client'.</li>
+<li> Client terminal window is going to ask for the name of the file that is to be sought, input the derired file name. </li>
+<li> If the file is found, a text file "DesiredText.txt" containing the contents of the sought file will be saved in the directory of the client file. </li>
 </ol>
 
 ```
@@ -77,8 +79,5 @@ gcc peer.c -o peer3
 gcc client.c -o client 
 ./client 127.0.0.1 8000 
 ```
-## NOTES
-<ul>
-    <li> Client terminal window is going to ask for the name of the file that is to be sought, input the derired file name. </li>
-    <li> If the file is found, a text file "DesiredText.txt" containing the contents of the sought file will be saved in the directory of the client file. </li>
-</ul>
+
+
