@@ -1,14 +1,18 @@
-NOTE - Kindly view the README.md file with a markdown viewer or visit the [github repo](https://github.com/eklavyaj/Relay-Based-Peer-to-Peer-System/) for the project.
+Relay Based Peer to Peer System using TCP connection 
+
+![image](https://user-images.githubusercontent.com/50804314/137678852-a4a077a1-f11b-43dd-8a77-ece0bb88c6ec.png)
+
+A relay based p2p system to perform file transfer between the peer node and peer clients by establishing TCP connections. 
 
 ## Directory Tree:
 
 ```
-Group_49
+MAIN
 │   README.md
-|   CS 342_Assignment 3_October_2020.pdf
-|
+|   
 │
 └───output  //images of terminal output, requested for "sample2.txt", i.e., available at 
+|
 │
 └───server
 │   │   server.c        // server code 
