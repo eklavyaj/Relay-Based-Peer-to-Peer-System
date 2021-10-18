@@ -1,5 +1,4 @@
-Relay Based Peer to Peer System using TCP connection 
-
+# Relay Based Peer-to-Peer System 
 ![image](https://user-images.githubusercontent.com/50804314/137678852-a4a077a1-f11b-43dd-8a77-ece0bb88c6ec.png)
 
 A relay based p2p system to perform file transfer between the peer node and peer clients by establishing TCP connections. 
